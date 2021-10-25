@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "raygui.h": "c",
+        "type_traits": "cpp",
+        "xtr1common": "cpp",
+        "iosfwd": "cpp",
+        "compare": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp",
+        "xmemory": "cpp",
+        "xutility": "cpp",
+        "xstring": "cpp"
+    }
+}
