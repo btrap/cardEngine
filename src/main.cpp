@@ -2,7 +2,6 @@
 #include <cmath>
 #include <cstdio>
 
-
 // Turn off visual studio compiler warnings
 #pragma warning(disable : 4201) // we want to allow anonymous unions and structs
 #pragma warning(disable : 4514) // stdlib abs/div being unreferenced
@@ -107,8 +106,6 @@ int main(int argc, char** argv)
     Game_State game_State = {};
 
     Camera2D camera = {0};
-    //camera.target = { 400, 280 };
-    //camera.offset = { system_State.screen_Width/2.0f, system_State.screen_Height/2.0f };
     camera.target = { 0, 0 };
     camera.offset = { 0, 0 };
     camera.rotation = 0.0f;

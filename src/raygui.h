@@ -417,7 +417,7 @@ struct Gui_EditActiveControl
     Rectangle bounds;
     const char *text;
 
-    bool *active;
+    bool active;
 
     bool edit_Mode;
 };
@@ -470,6 +470,19 @@ RAYGUIDEF void SetupGuiValueBox(Gui_EditValueFloatControl *guiValueBox)
 
     guiValueBox->edit_Mode = false;
 }
+
+RAYGUIDEF void SetupGuiValueBox(Gui_EditValueControl *guiValueBox)
+{
+    guiValueBox->bounds = {0};
+    guiValueBox->text = "Name";
+
+    guiValueBox->min_Value = -1000;
+    guiValueBox->value = 0;
+    guiValueBox->max_Value = 1000;
+
+    guiValueBox->edit_Mode = false;
+}
+
 
 struct Gui_EditStringControl
 {

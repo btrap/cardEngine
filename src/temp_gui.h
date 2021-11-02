@@ -140,7 +140,7 @@ void DrawTempGui(TempGui *tempGui)
         }  
         
         // First GUI column
-        *(tempGui->gui_CheckBox.active) = GuiCheckBox(&tempGui->gui_CheckBox, origin);
+        tempGui->gui_CheckBox.active = GuiCheckBox(&tempGui->gui_CheckBox, origin);
 
         GuiSetStyle(TEXTBOX, TEXT_ALIGNMENT, GUI_TEXT_ALIGN_CENTER);
         if(GuiSpinner(&tempGui->gui_Spinner, origin))

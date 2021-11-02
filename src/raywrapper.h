@@ -435,162 +435,113 @@ FUNC_SIG void MoveEntityData(Debug_Item *debug_Item, Vector2 position)
     }
 }
 
-//struct Visual_Card
-//{
-//
-//    Color color;
-//    float font_Height;
-//
-//    smax stack_Value;
-//    smax card_Index;
-//};
+FUNC_SIG void SetupDebugGuiData(char *debug_Item, Debug_Types type, const char *name, char** gui_Entities)
+{
+    switch(type)
+    {
+        case CARD_TYPE:
+        {
+            Visual_Card *temp_Card = (Visual_Card*)debug_Item;
+            SetupDebugGuiData((char*)(&temp_Card->rectangle), RECT_TYPE, "Card Rect", &gui_Entities[0]);
+            SetupDebugGuiData((char*)(&temp_Card->center), VEC2_TYPE, "Card Center Point", &gui_Entities[4]);
+            SetupDebugGuiData((char*)(&temp_Card->collidable), BOOL_TYPE, "Collidable", &gui_Entities[6]);
+            SetupDebugGuiData((char*)(&temp_Card->color), COLOR_TYPE, "Card Color", &gui_Entities[7]);
+            SetupDebugGuiData((char*)(&temp_Card->font_Height), FLOAT32_TYPE, "Font Height", &gui_Entities[8]);
+            SetupDebugGuiData((char*)(&temp_Card->stack_Value), INT32_TYPE, "Stack Index", &gui_Entities[9]);
+            SetupDebugGuiData((char*)(&temp_Card->card_Index), INT32_TYPE, "Card Index", &gui_Entities[10]);
+        }break;
+        case VEC2_TYPE:
+        {
+            Vector2 *temp_Rect = (Vector2 *)debug_Item;
+            SetupDebugGuiData((char*)(&temp_Rect->x), FLOAT32_TYPE, "X", &gui_Entities[0]);
+            SetupDebugGuiData((char*)(&temp_Rect->y), FLOAT32_TYPE, "Y", &gui_Entities[1]);
+        }break;
+        case VEC3_TYPE:
+        {
+            Vector3 *temp_Rect = (Vector3 *)debug_Item;
+            SetupDebugGuiData((char*)(&temp_Rect->x), FLOAT32_TYPE, "X", &gui_Entities[0]);
+            SetupDebugGuiData((char*)(&temp_Rect->y), FLOAT32_TYPE, "Y", &gui_Entities[1]);
+            SetupDebugGuiData((char*)(&temp_Rect->z), FLOAT32_TYPE, "Z", &gui_Entities[2]);
+        }break;
+        case RECT_TYPE:
+        {
+            Rectangle *temp_Rect = (Rectangle *)debug_Item;
+            SetupDebugGuiData((char*)(&temp_Rect->x), FLOAT32_TYPE, "X", &gui_Entities[0]);
+            SetupDebugGuiData((char*)(&temp_Rect->y), FLOAT32_TYPE, "Y", &gui_Entities[1]);
+            SetupDebugGuiData((char*)(&temp_Rect->width), FLOAT32_TYPE, "W", &gui_Entities[2]);
+            SetupDebugGuiData((char*)(&temp_Rect->height), FLOAT32_TYPE, "H", &gui_Entities[3]);
+        }break;
+        case COLOR_TYPE:
+        {
+            Color *color = 0;
+            STORE_PERM_DATA(color, sizeof(Color));
+            gui_Entities[0] = (char*)color;
+        }break;
+        case FLOAT32_TYPE:
+        {
+            Gui_EditValueFloatControl *value_Float = 0;
+            STORE_PERM_DATA(value_Float, sizeof(Gui_EditValueFloatControl));
+            SetupGuiValueBox(value_Float);
+            value_Float->value = (float*)debug_Item;
+            value_Float->text = name;
+            gui_Entities[0] = (char*)value_Float;
+        }break;
+        case INT32_TYPE:
+        {
+            Gui_EditValueControl *value_Int = 0;
+            STORE_PERM_DATA(value_Int, sizeof(Gui_EditValueControl));
+            SetupGuiValueBox(value_Int);
+            value_Int->value = *((int*)debug_Item);
+            value_Int->text = name;
+            gui_Entities[0] = (char*)value_Int;
+        }break;
+        case BOOL_TYPE:
+        {
+            Gui_EditActiveControl *value_Toggle = 0;
+            STORE_PERM_DATA(value_Toggle, sizeof(Gui_EditActiveControl));
+            value_Toggle->bounds = {0};
+            value_Toggle->text = name;
+            value_Toggle->active = *((bool*)debug_Item);
+            value_Toggle->edit_Mode = false;
+            gui_Entities[0] = (char*)value_Toggle;
+        }break;
+    }
+}
 
 FUNC_SIG void SetupDebugGuiData(Debug_Item *debug_Item)
-{ 
+{
     switch(debug_Item->type)
     {
         case CARD_TYPE:
         {
             Visual_Card *temp_Card = (Visual_Card*)debug_Item->entity;
-
-            Gui_EditValueFloatControl *rectX = 0;
-            STORE_PERM_DATA(rectX, sizeof(Gui_EditValueFloatControl));
-            SetupGuiValueBox(rectX);
-            rectX->value = &temp_Card->rectangle.x;
-            rectX->text = "X";
-            ++debug_Item->gui_Entity_Count;
-
-            Gui_EditValueFloatControl *rectY = 0;
-            STORE_PERM_DATA(rectY, sizeof(Gui_EditValueFloatControl));
-            SetupGuiValueBox(rectY);
-            rectY->value = &temp_Card->rectangle.y;
-            rectY->text = "Y";
-            ++debug_Item->gui_Entity_Count;
-
-            Gui_EditValueFloatControl *rectW = 0;
-            STORE_PERM_DATA(rectW, sizeof(Gui_EditValueFloatControl));
-            SetupGuiValueBox(rectW);
-            rectW->value = &temp_Card->rectangle.width;
-            rectW->text = "W";
-            ++debug_Item->gui_Entity_Count;
-
-            Gui_EditValueFloatControl *rectH = 0;
-            STORE_PERM_DATA(rectH, sizeof(Gui_EditValueFloatControl));
-            SetupGuiValueBox(rectH);
-            rectH->value = &temp_Card->rectangle.height;
-            rectH->text = "H";
-            ++debug_Item->gui_Entity_Count;
-
-            Gui_EditValueFloatControl *center_X = 0;
-            STORE_PERM_DATA(center_X, sizeof(Gui_EditValueFloatControl));
-            SetupGuiValueBox(center_X);
-            center_X->value = &temp_Card->center.x;
-            center_X->text = "Center X";
-            ++debug_Item->gui_Entity_Count;
-
-            Gui_EditValueFloatControl *center_Y = 0;
-            STORE_PERM_DATA(center_Y, sizeof(Gui_EditValueFloatControl));
-            SetupGuiValueBox(center_Y);
-            center_Y->value = &temp_Card->center.y;
-            center_Y->text = "Center Y";
-            ++debug_Item->gui_Entity_Count;
-
-            Gui_EditActiveControl *collidable = 0;
-            STORE_PERM_DATA(collidable, sizeof(Gui_EditActiveControl));
-            collidable->bounds = {0};
-            collidable->text = "Collidable";
-            collidable->active = &temp_Card->collidable;
-            collidable->edit_Mode = false;
-            ++debug_Item->gui_Entity_Count;
-
             debug_Item->gui_Entities = 0;
-            STORE_PERM_DATA(debug_Item->gui_Entities, sizeof(Gui_EditValueFloatControl*) * debug_Item->gui_Entity_Count);
+            debug_Item->gui_Entity_Count = 11;
 
-            debug_Item->gui_Entities[0] = (char*)rectX;
-            debug_Item->gui_Entities[1] = (char*)rectY;
-            debug_Item->gui_Entities[2] = (char*)rectW;
-            debug_Item->gui_Entities[3] = (char*)rectH;
-
-            debug_Item->gui_Entities[4] = (char*)center_X;
-            debug_Item->gui_Entities[5] = (char*)center_Y;
-
-            debug_Item->gui_Entities[6] = (char*)collidable;
+            STORE_PERM_DATA(debug_Item->gui_Entities, sizeof(Gui_EditValueFloatControl*) *debug_Item->gui_Entity_Count);
+ 
+            SetupDebugGuiData((char*)(&temp_Card->rectangle), RECT_TYPE, "Card Rect", &(debug_Item->gui_Entities[0]));
+            SetupDebugGuiData((char*)(&temp_Card->center), VEC2_TYPE, "Card Center Point", &(debug_Item->gui_Entities[4]));
+            SetupDebugGuiData((char*)(&temp_Card->collidable), BOOL_TYPE, "Collidable", &(debug_Item->gui_Entities[6]));
+            SetupDebugGuiData((char*)(&temp_Card->color), COLOR_TYPE, "Card Color", &(debug_Item->gui_Entities[7]));
+            SetupDebugGuiData((char*)(&temp_Card->font_Height), FLOAT32_TYPE, "Font Height", &(debug_Item->gui_Entities[8]));
+            SetupDebugGuiData((char*)(&temp_Card->stack_Value), INT32_TYPE, "Stack Value", &(debug_Item->gui_Entities[9]));
+            SetupDebugGuiData((char*)(&temp_Card->card_Index), INT32_TYPE, "Card Index", &(debug_Item->gui_Entities[10]));
         }break;
         case WINDOW_TYPE:
         {
             Gui_Window *temp_Window = (Gui_Window*)debug_Item->entity;
-
-            Gui_EditValueFloatControl *posX = 0; //(Gui_EditValueFloatControl*)(malloc(sizeof(Gui_EditValueFloatControl)));
-            STORE_PERM_DATA(posX, sizeof(Gui_EditValueFloatControl));
-            SetupGuiValueBox(posX);
-            posX->value = &temp_Window->position.x;
-            posX->text = "X";
-            ++debug_Item->gui_Entity_Count;
-
-            Gui_EditValueFloatControl *posY = 0; //(Gui_EditValueFloatControl*)(malloc(sizeof(Gui_EditValueFloatControl)));
-            STORE_PERM_DATA(posY, sizeof(Gui_EditValueFloatControl));
-            SetupGuiValueBox(posY);
-            posY->value = &temp_Window->position.y;
-            posY->text = "Y";
-            ++debug_Item->gui_Entity_Count;
-
-            Gui_EditValueFloatControl *rectX = 0; //(Gui_EditValueFloatControl*)(malloc(sizeof(Gui_EditValueFloatControl)));
-            STORE_PERM_DATA(rectX, sizeof(Gui_EditValueFloatControl));
-            SetupGuiValueBox(rectX);
-            rectX->value = &temp_Window->rectangle.x;
-            rectX->text = "X";
-            ++debug_Item->gui_Entity_Count;
-
-            Gui_EditValueFloatControl *rectY = 0; //(Gui_EditValueFloatControl*)(malloc(sizeof(Gui_EditValueFloatControl)));
-            STORE_PERM_DATA(rectY, sizeof(Gui_EditValueFloatControl));
-            SetupGuiValueBox(rectY);
-            rectY->value = &temp_Window->rectangle.y;
-            rectY->text = "Y";
-            ++debug_Item->gui_Entity_Count;
-
-            Gui_EditValueFloatControl *rectW = 0; //(Gui_EditValueFloatControl*)(malloc(sizeof(Gui_EditValueFloatControl)));
-            STORE_PERM_DATA(rectW, sizeof(Gui_EditValueFloatControl));
-            SetupGuiValueBox(rectW);
-            rectW->value = &temp_Window->rectangle.width;
-            rectW->text = "W";
-            ++debug_Item->gui_Entity_Count;
-
-            Gui_EditValueFloatControl *rectH = 0; //(Gui_EditValueFloatControl*)(malloc(sizeof(Gui_EditValueFloatControl)));
-            STORE_PERM_DATA(rectH, sizeof(Gui_EditValueFloatControl));
-            SetupGuiValueBox(rectH);
-            rectH->value = &temp_Window->rectangle.height;
-            rectH->text = "H";
-            ++debug_Item->gui_Entity_Count;
-
-            //debug_Item->gui_Entities = (char**)malloc(sizeof(Gui_EditValueFloatControl*) * debug_Item->gui_Entity_Count);
             debug_Item->gui_Entities = 0;
-            STORE_PERM_DATA(debug_Item->gui_Entities, sizeof(Gui_EditValueFloatControl*) * debug_Item->gui_Entity_Count);
-
-            debug_Item->gui_Entities[0] = (char*)posX;
-            debug_Item->gui_Entities[1] = (char*)posY;
-            debug_Item->gui_Entities[2] = (char*)rectX;
-            debug_Item->gui_Entities[3] = (char*)rectY;
-            debug_Item->gui_Entities[4] = (char*)rectW;
-            debug_Item->gui_Entities[5] = (char*)rectH;
+            debug_Item->gui_Entity_Count = 6;
+            STORE_PERM_DATA(debug_Item->gui_Entities, sizeof(Gui_EditValueFloatControl*) *debug_Item->gui_Entity_Count);
+            
+            SetupDebugGuiData((char*)(&temp_Window->position), VEC2_TYPE, "Card Center Point", &(debug_Item->gui_Entities[0]));
+            SetupDebugGuiData((char*)(&temp_Window->rectangle), RECT_TYPE, "Card Rect", &(debug_Item->gui_Entities[2]));
         }break;
     }
 }
 
-FUNC_SIG void MouseTests()
-{
-
-}
-
-//struct Visual_Card
-//{
-//
-//    Color color;
-//    float font_Height;
-//
-//    smax stack_Value;
-//    smax card_Index;
-//};
-FUNC_SIG void DrawType(Rectangle window_Slice, Debug_Types type, char** gui_Entities, int gui_Entity_Count)
+FUNC_SIG void DrawType(Rectangle window_Slice, char *entity, Debug_Types type, char** gui_Entities)
 {
     float x_Edge = 5.0f;
     float y_Edge = 5.0f;
@@ -601,49 +552,80 @@ FUNC_SIG void DrawType(Rectangle window_Slice, Debug_Types type, char** gui_Enti
 
     float vec_Width = (window_Slice.width - x_Edge * 3.0f - textBox_Padding * 2.0f) / 2.0f;
     float vec_Height = (window_Slice.height - y_Edge * 3.0f) / 2.0f;
+    
+    int item_Height = 1;
+    float local_Height = 0.0f;
 
     switch(type)
     {
         case CARD_TYPE:
         {
-            Rectangle rect_Rect = {window_Slice.x + x_Edge, 
-                                   window_Slice.y + y_Edge, 
-                                   window_Slice.width - 2.0f * x_Edge, 
-                                   total * 2.0f};
+            Rectangle rect_Rect = { window_Slice.x + x_Edge, window_Slice.y + local_Height + y_Edge * (float)(item_Height),
+                                   window_Slice.width - 2.0f * x_Edge, total * 2.0f };
+            local_Height += rect_Rect.height;
+            ++item_Height;
             GuiGroupBox(rect_Rect, "Rect");
-            DrawType(rect_Rect, RECT_TYPE, gui_Entities, 4);
+            DrawType(rect_Rect, entity, RECT_TYPE, gui_Entities);
 
-            Rectangle center_Rect = {window_Slice.x + x_Edge, 
-                                   window_Slice.y + rect_Rect.height + y_Edge * 2.0f, 
-                                   window_Slice.width - 2.0f * x_Edge, 
-                                   total};
-            GuiGroupBox(center_Rect, "Center");
-            DrawType(center_Rect, VEC2_TYPE, &gui_Entities[4], 2);
+            rect_Rect.y = window_Slice.y + local_Height + y_Edge * (float)(item_Height);
+            rect_Rect.height = total;
+            local_Height += rect_Rect.height;
+            ++item_Height;
+            GuiGroupBox(rect_Rect, "Center");
+            DrawType(rect_Rect, entity, VEC2_TYPE, &gui_Entities[4]);
 
-            Rectangle collidable_Rect = {window_Slice.x + x_Edge, 
-                                   window_Slice.y + rect_Rect.height + center_Rect.height + y_Edge * 3.0f, 
-                                   window_Slice.width - 2.0f * x_Edge, 
-                                   total};
-            GuiGroupBox(collidable_Rect, "Collidable");
-            DrawType(collidable_Rect, BOOL_TYPE, &gui_Entities[6], 1);
+            rect_Rect.y = window_Slice.y + local_Height + y_Edge * (float)(item_Height);
+            rect_Rect.height = total;
+            local_Height += rect_Rect.height;
+            ++item_Height;
+            DrawType(rect_Rect, entity, BOOL_TYPE, &gui_Entities[6]);
+            ((Visual_Card *)entity)->collidable = ((Gui_EditActiveControl*)gui_Entities[6])->active;
 
-
+            rect_Rect.y = window_Slice.y + local_Height + y_Edge * (float)(item_Height);
+            rect_Rect.height = 202.0f;
+            local_Height += rect_Rect.height;
+            ++item_Height;
+            *((Color*)gui_Entities[7]) = ((Visual_Card *)entity)->color;
+            DrawType(rect_Rect, entity, COLOR_TYPE, &gui_Entities[7]);
+            ((Visual_Card *)entity)->color = *((Color*)gui_Entities[7]);
+            
+            rect_Rect.y = window_Slice.y + local_Height + y_Edge * (float)(item_Height);
+            rect_Rect.width = window_Slice.width - 2.0f * x_Edge;
+            rect_Rect.height = total;
+            local_Height += rect_Rect.height;
+            ++item_Height;
+            DrawType(rect_Rect, entity, FLOAT32_TYPE, &gui_Entities[8]);
+            
+            rect_Rect.y = window_Slice.y + local_Height + y_Edge * (float)(item_Height);
+            rect_Rect.width = window_Slice.width - 2.0f * x_Edge;
+            rect_Rect.height = total;
+            local_Height += rect_Rect.height;
+            ++item_Height;
+            DrawType(rect_Rect, entity, INT32_TYPE, &gui_Entities[9]);
+            
+            rect_Rect.y = window_Slice.y + local_Height + y_Edge * (float)(item_Height);
+            rect_Rect.width = window_Slice.width - 2.0f * x_Edge;
+            rect_Rect.height = total;
+            local_Height += rect_Rect.height;
+            ++item_Height;
+            DrawType(rect_Rect, entity, INT32_TYPE, &gui_Entities[10]);
         }break;
         case WINDOW_TYPE:
         {
-            Rectangle position_Rect = {window_Slice.x + x_Edge, 
-                                       window_Slice.y + y_Edge, 
-                                       window_Slice.width - 2.0f * x_Edge, 
-                                       total};
-            GuiGroupBox(position_Rect, "Position");
-            DrawType(position_Rect, VEC2_TYPE, gui_Entities, 2);
+            Rectangle rect_Rect = { window_Slice.x + x_Edge, window_Slice.y + y_Edge,  window_Slice.width - 2.0f * x_Edge, total };
+            GuiGroupBox(rect_Rect, "Position");
+            DrawType(rect_Rect, entity, VEC2_TYPE, gui_Entities);
 
-            Rectangle rect_Rect = {window_Slice.x + x_Edge, 
-                                   window_Slice.y + position_Rect.height + y_Edge * 2.0f, 
-                                   window_Slice.width - 2.0f * x_Edge, 
-                                   total * 2.0f};
+            rect_Rect.y = window_Slice.y + rect_Rect.height + y_Edge * 2.0f;
+            rect_Rect.width = window_Slice.width - 2.0f * x_Edge;
+            rect_Rect.height = total * 2.0f;
             GuiGroupBox(rect_Rect, "Rect");
-            DrawType(rect_Rect, RECT_TYPE, &gui_Entities[2], 4);
+            DrawType(rect_Rect, entity, RECT_TYPE, &gui_Entities[2]);
+        }break;
+        case COLOR_TYPE:
+        {
+            Color *temp_Color = (Color*)(gui_Entities[0]);
+            *temp_Color = GuiColorPicker({ window_Slice.x + text_Height * 5.0f + textBox_Padding + 320.0f, window_Slice.y, 196.0f, 192.0f }, *temp_Color);
         }break;
         case BOOL_TYPE:
         {
@@ -657,10 +639,7 @@ FUNC_SIG void DrawType(Rectangle window_Slice, Debug_Types type, char** gui_Enti
                 window_Slice.height 
             };
 
-            *(temp_boolToggleControl->active) = GuiCheckBox(temp_boolToggleControl);
-
-            DrawRectangleLinesEx(window_Slice, 1, RED);
-            DrawRectangleLinesEx(temp_boolToggleControl->bounds, 1, RED);
+            temp_boolToggleControl->active = GuiCheckBox(temp_boolToggleControl);
         }break;
         case FLOAT32_TYPE:
         {
@@ -668,18 +647,33 @@ FUNC_SIG void DrawType(Rectangle window_Slice, Debug_Types type, char** gui_Enti
 
             temp_FloatControl->bounds =
             {
-                window_Slice.x + text_Height * 5.0f + textBox_Padding, 
-                window_Slice.y, 
-                window_Slice.width - textBox_Padding - text_Height * 5.0f , 
-                window_Slice.height 
+                window_Slice.x + text_Height * 5.0f + textBox_Padding,
+                window_Slice.y,
+                window_Slice.width - textBox_Padding - text_Height * 5.0f ,
+                window_Slice.height
             };
 
             if(GuiValueBox(temp_FloatControl))
             {
                 temp_FloatControl->edit_Mode = !temp_FloatControl->edit_Mode;
             }
-            DrawRectangleLinesEx(window_Slice, 1, RED);
-            DrawRectangleLinesEx(temp_FloatControl->bounds, 1, RED);
+        }break;
+        case INT32_TYPE:
+        {
+            Gui_EditValueControl *temp_IntControl = (Gui_EditValueControl*)(gui_Entities[0]);
+
+            temp_IntControl->bounds =
+            {
+                window_Slice.x + text_Height * 5.0f + textBox_Padding,
+                window_Slice.y,
+                window_Slice.width - textBox_Padding - text_Height * 5.0f ,
+                window_Slice.height
+            };
+
+            if(GuiValueBox(temp_IntControl))
+            {
+                temp_IntControl->edit_Mode = !temp_IntControl->edit_Mode;
+            }
         }break;
         case RECT_TYPE:
         {
@@ -779,48 +773,8 @@ FUNC_SIG void DebugEditor(Gui_Window *editor_Window, Debug_Item * debug_Item)
 
     window_Slice.y += text_Height;
     window_Slice.height -= text_Height;
-    DrawType(window_Slice, debug_Item->type, debug_Item->gui_Entities, debug_Item->gui_Entity_Count);
+    DrawType(window_Slice, (char*)debug_Item->entity, debug_Item->type, debug_Item->gui_Entities);
 
     EndScissorMode();
 }
 
-FUNC_SIG void UpdateCameraPlayerBoundsPush(Camera2D *camera, Visual_Card *cards, int card_Count, float delta, int width, int height) 
-{
-    static Vector2 bbox = { 0.2f, 0.2f };
-
-    Vector2 bboxWorldMin = GetScreenToWorld2D({ (1.0f - bbox.x) * 0.5f * width, (1.0f - bbox.y) * 0.5f * height }, *camera);
-    Vector2 bboxWorldMax = GetScreenToWorld2D({ (1.0f + bbox.x) * 0.5f * width, (1.0f + bbox.y) * 0.5f * height }, *camera);
-    camera->offset = { (1.0f - bbox.x) * 0.5f * width, (1 - bbox.y)*0.5f*height };
-
-    Vector2 edge = camera->target;
-
-    // if(player->position.x < bboxWorldMin.x)
-    // {
-    //     edge.x = player->position.x;
-    // }
-    // else if(player->postion.x > bboxWorldMax.x)
-    // {
-    //     edge.x = bboxWorldMin.x + (player->position.x - bboxWorldMax.x);
-    // }
-
-    // if(player->position.y < bboxWorldMin.y)
-    // {
-    //     edge.y = player->position.y;
-    // }    else if(player->position.y > bboxWorldMax.y)
-    // {
-    //     edge.y = bboxWorldMin.y + (player->position.y - bboxWorldMax.y);
-    // }
-
-    static float minSpeed = 60.0f;
-    static float minEffectLength = 1.0f;
-    static float fractionSpeed = 0.8f;
-
-    Vector2 diff = Vector2Subtract(edge, camera->target);
-    float length = Vector2Length(diff);
-    
-    if(length > minEffectLength)
-    {
-        float speed = fmaxf(fractionSpeed*length, minSpeed);
-        camera->target = Vector2Add(camera->target, Vector2Scale(diff, speed*delta/length));
-    }
- }
