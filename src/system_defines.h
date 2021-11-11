@@ -7,9 +7,6 @@
 // ========================================================================
 #pragma once
 
-//#define _X86_
-#define _AMD64_
-
 #if !defined(COMPILER_MSVC)
 #define COMPILER_MSVC 0
 #endif

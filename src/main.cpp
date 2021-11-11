@@ -1,6 +1,5 @@
-#include <raylib.h>
-#include <cmath>
-#include <cstdio>
+//#define _X86_
+#define _AMD64_
 
 // Turn off visual studio compiler warnings
 #pragma warning(disable : 4201) // we want to allow anonymous unions and structs
@@ -16,82 +15,22 @@
 #include "variable_defines.h"
 #include "system_defines.h"
 
-// ray lib stuff
-#include "raywrapper.h"
-#include "temp_gui.h"
-
 // other
 #include "memory.h"
 #include "char_array.h"
 
+// ray lib stuff
+#include "raylib.h"
+#include "raymath.h"
+
 // card game code
 #include "casina_game.h"
+#include "visual_game.h"
 
-void DrawVisualCards(Visual_Card *visual_Cards, StandardCardSet *card_Set, umax card_Count)
-{
-    for(umax i = 0; i < card_Count; i++)
-    {
-        if(visual_Cards[i].card_Index < 0)
-        {
-            continue;
-        }
+// ray gui stuff
+#include "raywrapper.h"
 
-        DrawRectangleRec(visual_Cards[i].rectangle, visual_Cards[i].color);
-        Rectangle card_Value_Rect = {visual_Cards[i].rectangle.x, visual_Cards[i].rectangle.y + visual_Cards[i].rectangle.height / 2.0f, visual_Cards[i].rectangle.width + 50.0f, visual_Cards[i].rectangle.height};
-        const char * suit_String = GetSuitString(card_Set->cards[visual_Cards[i].card_Index]->suit);
-        const char * value_String = GetValueString(card_Set->cards[visual_Cards[i].card_Index]->value);
-        char * final_ID = 0;
-        umax final_ID_Length = TextLength(suit_String) + TextLength(value_String) + 1;
-        STORE_TEMP_DATA(final_ID, final_ID_Length);
-        int length = 0;
-        TextCopy(final_ID + length, value_String);
-        length += TextLength(value_String);
-        TextCopy(final_ID + length, " ");
-        ++length;
-        TextCopy(final_ID + length, suit_String);
-        length += TextLength(suit_String);
-        TextCopy(final_ID + length, " ");
-        ++length;
-        itoa(visual_Cards[i].stack_Value, final_ID + length, 10);
-        DrawTextRec(GetFontDefault(), final_ID, card_Value_Rect, 30.0f, 2.0f, false, LIGHTGRAY);
-    }
-}
-
-void UpdateVisualCards(Visual_Card *visual_Cards, smax starting_Card, smax card_Count)
-{
-    for(smax i = starting_Card; i < card_Count; ++i)
-    {
-        --visual_Cards[i].card_Index;
-    }
-}
-
-void SetupVisualCards(CasinaBoard *casina_Board, Visual_Board *visual_Board, Visual_Card *p1_Cards, Visual_Card *p2_Cards)
-{
-    smax p2_Cards_Count = 4;
-    SetupPlayerVisualBoardHand(visual_Board, p2_Cards, p2_Cards_Count, &visual_Board->player_Two_Zone);
-    for(umax i = 0; i < casina_Board->player2.hand.card_Count; ++i)
-    {
-        p2_Cards[i].center = {0.0f, 0.0f};
-        p2_Cards[i].collidable = true;
-        UpdateCardCenter(&p2_Cards[i]);
-
-        p2_Cards[i].card_Index = i;
-        p2_Cards[i].stack_Value = casina_Board->player2.hand.cards[i]->value;
-    }
-
-    smax p1_Cards_Count = 4;
-    SetupPlayerVisualBoardHand(visual_Board, p1_Cards, p1_Cards_Count, &visual_Board->player_One_Zone);
-    for(umax i = 0; i < casina_Board->player1.hand.card_Count; ++i)
-    {
-        p1_Cards[i].center = {0.0f, 0.0f};
-        p1_Cards[i].collidable = true;
-        UpdateCardCenter(&p1_Cards[i]);
-        
-        p1_Cards[i].card_Index = i;
-        p1_Cards[i].stack_Value = casina_Board->player1.hand.cards[i]->value;
-    }
-}
-
+// Stack is 26324 but should be 16384
 int main(int argc, char** argv)
 {
     // Init memory
@@ -104,12 +43,6 @@ int main(int argc, char** argv)
 
     // Setup game data
     Game_State game_State = {};
-
-    Camera2D camera = {0};
-    camera.target = { 0, 0 };
-    camera.offset = { 0, 0 };
-    camera.rotation = 0.0f;
-    camera.zoom = 1.0f;
 
     // Setup Casina Game
     CasinaBoard casina_Board = {};
@@ -124,11 +57,12 @@ int main(int argc, char** argv)
     const char* working_Directory = GetWorkingDirectory();
     Vector2 font_Size = MeasureTextEx(gui_Font, working_Directory, gui_Font.baseSize, 0);
 
+    // Basic Card info
     float card_Height = 88.0f;
     float card_Width = 63.0f;
-
     Color base_Card_Color = MAROON;
 
+    // Setup cards on the board
     Visual_Card *p2_Cards = 0;
     smax p2_Cards_Count = 4;
     STORE_PERM_DATA(p2_Cards, p2_Cards_Count);
@@ -320,7 +254,7 @@ int main(int argc, char** argv)
         if(IsKeyPressed(KEY_R)) // RESET THE LEVEL
         {
             game_State.editor_Control_Settings = EDITOR_CONTROL_EDIT;
-            camera.zoom = 1.0f;
+            system_State.camera.zoom = 1.0f;
         }
 
         if((game_State.editor_Control_Settings == EDITOR_CONTROL_EDIT))
@@ -362,11 +296,11 @@ int main(int argc, char** argv)
         lastGesture = currentGesture;
         currentGesture = GetGestureDetected();
         touchPosition = GetTouchPosition(0);
-        Vector2 screen_Space_Touch_Position = GetScreenToWorld2D(touchPosition, camera);
+        Vector2 screen_Space_Touch_Position = GetScreenToWorld2D(touchPosition, system_State.camera);
 
         // update
         //----------------------------------------------------------------------------------
-        //UpdateCameraPlayerBoundsPush(&camera, walls, walls_Length, deltaTime, system_State.screen_Width, system_State.screen_Height);
+        //UpdateCameraPlayerBoundsPush(&system_State.camera, walls, walls_Length, deltaTime, system_State.screen_Width, system_State.screen_Height);
 
         scene_Debug_Items.item_Hover = -1;
         gui_Debug_Items.item_Hover = -1;
@@ -376,14 +310,14 @@ int main(int argc, char** argv)
         // }
         // else if(game_State.editor_Control_Settings == EDITOR_CONTROL_EDIT)
         // {
-            camera.zoom += ((float)GetMouseWheelMove()*0.05f);
-            if (camera.zoom > 3.0f)
+            system_State.camera.zoom += ((float)GetMouseWheelMove()*0.05f);
+            if (system_State.camera.zoom > 3.0f)
             {
-                camera.zoom = 3.0f;
+                system_State.camera.zoom = 3.0f;
             }
-            else if (camera.zoom < 0.25f)
+            else if (system_State.camera.zoom < 0.25f)
             {
-                camera.zoom = 0.25f;
+                system_State.camera.zoom = 0.25f;
             }
 
             //find the item a mouse is over
@@ -708,7 +642,7 @@ int main(int argc, char** argv)
 
             DrawRectangleRec({0.0f, 0.0f, (float)system_State.screen_Width, (float)system_State.screen_Height}, BLACK);
 
-            BeginMode2D(camera);
+            BeginMode2D(system_State.camera);
 
                 GuiSetStyle(LABEL, TEXT_ALIGNMENT, GUI_TEXT_ALIGN_CENTER);
 
@@ -815,7 +749,7 @@ int main(int argc, char** argv)
 
             if(game_State.editor_Mode_Settings == EDITOR_MODE_GAME)
             {
-                BeginMode2D(camera);
+                BeginMode2D(system_State.camera);
 
                 if(scene_Debug_Items.item_Hover > -1)
                 {

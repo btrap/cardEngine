@@ -170,8 +170,8 @@
     <ClInclude Include="src\raywrapper.h" />
     <ClInclude Include="src\ricons.h" />
     <ClInclude Include="src\system_defines.h" />
-    <ClInclude Include="src\temp_gui.h" />
     <ClInclude Include="src\variable_defines.h" />
+    <ClInclude Include="src\visual_game.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

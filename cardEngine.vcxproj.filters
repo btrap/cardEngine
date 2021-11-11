@@ -41,10 +41,10 @@
     <ClInclude Include="src\system_defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\temp_gui.h">
+    <ClInclude Include="src\variable_defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\variable_defines.h">
+    <ClInclude Include="src\visual_game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

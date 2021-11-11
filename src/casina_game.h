@@ -22,6 +22,32 @@ enum STANDARD_CARD_SUITS
     STANDARD_CARD_CLUB,
 };
 
+smax GetBoardStep(smax index)
+{
+    switch(index)
+    {
+        case 0:
+        case 1:
+            return 2;
+        case 2:
+        case 3:
+            return 3;
+        case 4:
+        case 5:
+            return 1;
+        case 6:
+        case 7:
+            return 4;
+        case 8:
+        case 9:
+            return 0;
+        case 10:
+        case 11:
+            return 5;
+    }
+    return 0;
+}
+
 const char * GetSuitString(STANDARD_CARD_SUITS suit)
 {
     switch(suit)

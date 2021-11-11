@@ -3,7 +3,7 @@
 #include "variable_defines.h"
 #include "system_defines.h"
 
-#include <cstdio> // malloc, realloc, calloc, free
+#include <cstdlib> // malloc, realloc, calloc, free
 
 #define VC_EXTRALEAN
 #define WIN32_LEAN_AND_MEAN
